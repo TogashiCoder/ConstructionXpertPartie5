@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="Ressource_service" />
+        <module name="Gestion_utilisateurs" />
+        <module name="Projets_service" />
+        <module name="Taches_service" />
+        <module name="Gateway_service" />
+        <module name="discovery_service" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="Gateway_service" options="-parameters" />
+      <module name="Gestion_utilisateurs" options="-parameters" />
+      <module name="Projets_service" options="-parameters" />
+      <module name="Ressource_service" options="-parameters" />
+      <module name="Taches_service" options="-parameters" />
+      <module name="discovery_service" options="-parameters" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  discovery-service:
+    image: eurekaserver:latest
+    build:
+      context: ./discovery_service
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_APPLICATION_NAME=discovery-service
+      - SERVER_PORT=8761
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+    networks:
+      - ilham-network
+
+  gateway-service:
+    image: gateway-service:latest
+    build:
+      context: ./Gateway_service
+    ports:
+      - "8765:8765"
+    environment:
+      - SPRING_APPLICATION_NAME=gateway-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].ID=projets-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].URI=http://projets-service:8081
+      - SPRING_CLOUD_GATEWAY_ROUTES[0].PREDICATES[0]=Path=/api/Projets/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].ID=taches-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].URI=http://taches-service:8082
+      - SPRING_CLOUD_GATEWAY_ROUTES[1].PREDICATES[0]=Path=/api/Taches/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[2].ID=ressources-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[2].URI=http://ressources-service:8083
+      - SPRING_CLOUD_GATEWAY_ROUTES[2].PREDICATES[0]=Path=/api/Ressource/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[3].ID=gestion-utilisateurs-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[3].URI=http://gestion-utilisateurs-service:8084
+      - SPRING_CLOUD_GATEWAY_ROUTES[3].PREDICATES[0]=Path=/api/v1/auth/**
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+    networks:
+      - ilham-network
+
+  mysql-U:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Ilham@2020
+      MYSQL_DATABASE: utilisateurservice
+    networks:
+      - ilham-network
+
+  gestion-utilisateurs-service:
+    image: gestion-utilisateurs-service:latest
+    build:
+      context: ./Gestion_utilisateurs
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_APPLICATION_NAME=gestion-utilisateurs-service
+      - SERVER_PORT=8084
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-U:3306/utilisateurservice
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Ilham@2020
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+      - mysql-U
+    networks:
+      - ilham-network
+
+  mysql-P:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Ilham@2020
+      MYSQL_DATABASE: projetservice
+
+    networks:
+      - ilham-network
+
+  projets-service:
+    image: projets-service:latest
+    build:
+      context: ./Projets_service
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_APPLICATION_NAME=projets-service
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-P:3306/projetservice
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Ilham@2020
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+      - mysql-P
+    networks:
+      - ilham-network
+
+  mysql-T:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Ilham@2020
+      MYSQL_DATABASE: tacheservice
+    networks:
+      - ilham-network
+
+  taches-service:
+    image: taches-service:latest
+    build:
+      context: ./Taches_service
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_APPLICATION_NAME=taches-service
+      - SERVER_PORT=8082
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-T:3306/tacheservice
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Ilham@2020
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+      - mysql-T
+    networks:
+      - ilham-network
+
+  mysql-R:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: Ilham@2020
+      MYSQL_DATABASE: ressourceservice
+    networks:
+      - ilham-network
+
+  ressources-service:
+    image: ressources-service:latest
+    build:
+      context: ./Ressource_service
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_APPLICATION_NAME=ressources-service
+      - SERVER_PORT=8083
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-R:3306/ressourceservice
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=Ilham@2020
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-service:8761/eureka/
+    depends_on:
+      - discovery-service
+      - mysql-R
+    networks:
+      - ilham-network
+
+networks:
+  ilham-network:
+    driver: bridge
