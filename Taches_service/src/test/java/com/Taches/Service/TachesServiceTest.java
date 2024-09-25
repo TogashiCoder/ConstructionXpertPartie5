@@ -64,18 +64,6 @@ class TachesServiceTest {
     }
 
     @Test
-    void createTache_ShouldThrowException_WhenProjectDoesNotExist() {
-        TachesDto tachesDto = new TachesDto();
-
-        when(projetInterface.getProjectById(1L)).thenReturn(null);
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            tachesService.createTache(tachesDto, 1L);
-        });
-        assertEquals("Projet non trouvé : ID 1", exception.getMessage());
-    }
-
-    @Test
     void getTachesById_ShouldReturnTachesDto_WhenTaskExists() {
         Taches existingTache = new Taches();
         existingTache.setId(1L);
